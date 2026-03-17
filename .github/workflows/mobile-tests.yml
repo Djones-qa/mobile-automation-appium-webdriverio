@@ -32,5 +32,4 @@ jobs:
           api-level: 30
           arch: x86_64
           profile: pixel_4
-          app-path: apps/wikipedia.apk
           script: npm test

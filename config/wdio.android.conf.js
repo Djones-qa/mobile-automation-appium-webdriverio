@@ -9,8 +9,8 @@ exports.config = {
   capabilities: [{
     platformName: 'Android',
     'appium:deviceName': 'emulator-5554',
-    // Match the available emulator OS version (current device shows API 16).
-    'appium:platformVersion': '16',
+    // Match the emulator built in CI (android-30 image == Android 11).
+    'appium:platformVersion': process.env.ANDROID_PLATFORM_VERSION || '11',
     'appium:automationName': 'UiAutomator2',
     'appium:app': path.resolve(__dirname, '../apps/wikipedia.apk'),
     'appium:appPackage': 'org.wikipedia.alpha',
