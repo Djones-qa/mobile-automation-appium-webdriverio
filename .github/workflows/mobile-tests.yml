@@ -61,12 +61,26 @@ jobs:
 
       - name: Boot iOS Simulator
         run: |
-          DEVICE_NAME="iPhone 15"
-          UDID=$(xcrun simctl list devices available | grep "$DEVICE_NAME (" | head -n1 | awk -F'[()]' '{print $2}')
+          # Pick the newest iPhone simulator available on macos-latest runners.
+          devices=$(xcrun simctl list devices available)
+          UDID=$(
+            echo "$devices" | grep -E "iPhone 15( Pro Max| Pro| Plus)? \(" | head -n1 | awk -F'[()]' '{print $2}'
+          )
           if [ -z "$UDID" ]; then
-            echo "No available simulator named $DEVICE_NAME" >&2
+            UDID=$(
+              echo "$devices" | grep -E "iPhone 14( Pro Max| Pro| Plus)? \(" | head -n1 | awk -F'[()]' '{print $2}'
+            )
+          fi
+          if [ -z "$UDID" ]; then
+            UDID=$(
+              echo "$devices" | grep -E "iPhone [0-9]+[A-Za-z ]* \(" | head -n1 | awk -F'[()]' '{print $2}'
+            )
+          fi
+          if [ -z "$UDID" ]; then
+            echo "No available iPhone simulator found" >&2
             exit 1
           fi
+          echo "Using simulator UDID: $UDID"
           echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
           xcrun simctl boot "$UDID" || true
 
