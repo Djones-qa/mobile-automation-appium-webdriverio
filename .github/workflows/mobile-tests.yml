@@ -33,3 +33,38 @@ jobs:
           arch: x86_64
           profile: pixel_4
           script: npm test
+
+  ios-tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install XCUITest driver
+        run: appium driver install xcuitest
+
+      - name: Install iOS dependencies
+        run: brew install ios-deploy
+
+      - name: List available simulators
+        run: xcrun simctl list devices available
+
+      - name: Boot iOS Simulator
+        run: |
+          UDID=
+          echo "SIMULATOR_UDID=" >> 
+          xcrun simctl boot "" || true
+
+      - name: Run iOS smoke test
+        run: npx wdio run config/wdio.ios.conf.ts
+        continue-on-error: true
