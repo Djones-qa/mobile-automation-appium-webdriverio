@@ -61,9 +61,14 @@ jobs:
 
       - name: Boot iOS Simulator
         run: |
-          UDID=
-          echo "SIMULATOR_UDID=" >> 
-          xcrun simctl boot "" || true
+          DEVICE_NAME="iPhone 15"
+          UDID=$(xcrun simctl list devices available | grep "$DEVICE_NAME (" | head -n1 | awk -F'[()]' '{print $2}')
+          if [ -z "$UDID" ]; then
+            echo "No available simulator named $DEVICE_NAME" >&2
+            exit 1
+          fi
+          echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" || true
 
       - name: Run iOS smoke test
         run: npx wdio run config/wdio.ios.conf.ts
